@@ -10,21 +10,10 @@
             "use": "@vercel/static"
         }
     ],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/(.*)",
-            "dest": "app.py"
-        }
-    ],
-    "headers": [
-        {
-            "source": "/static/(.*)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                }
-            ]
+            "source": "/(.*)",
+            "destination": "/app.py"
         }
     ]
 }
