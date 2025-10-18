@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="main-title">AI Image Classification</h1>
+            <p class="main-subtitle">Upload an image and let our CNN model classify it with deep learning</p>
+            
+            <div class="upload-container">
+                <div class="upload-card">
+                    <div class="card-header">
+                        <h3>📁 Upload Image</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-content">
+                                    <div class="upload-icon">📸</div>
+                                    <h4>Drag & Drop your image</h4>
+                                    <p>or click to browse files</p>
+                                    <div class="supported-formats">
+                                        <span>Supported: JPG, PNG, GIF</span>
+                                    </div>
+                                </div>
+                                <input type="file" id="file-input" name="file" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="file-info" id="file-info" style="display: none;">
+                                <div class="file-details">
+                                    <span class="file-name" id="file-name"></span>
+                                    <span class="file-size" id="file-size"></span>
+                                </div>
+                            </div>
+                            <button type="submit" class="predict-btn" id="predict-btn" disabled>
+                                <span class="btn-text">Classify Image</span>
+                                <div class="loading-spinner" style="display: none;"></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="preview-card">
+                    <div class="card-header">
+                        <h3>👁️ Image Preview</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-placeholder" id="preview-placeholder">
+                            <div class="preview-icon">🖼️</div>
+                            <p>Your image will appear here</p>
+                        </div>
+                        <div class="preview-image" id="preview-image" style="display: none;">
+                            <img id="preview-img" src="" alt="Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Deep Learning</h3>
+                    <p>Powered by Convolutional Neural Networks for accurate image classification</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast Processing</h3>
+                    <p>Get instant predictions with our optimized model architecture</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>High Accuracy</h3>
+                    <p>Trained on diverse datasets for reliable performance</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

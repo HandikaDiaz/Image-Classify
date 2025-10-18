@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="result-section">
+    <div class="container">
+        <div class="result-content">
+            <div class="result-header">
+                <h1 class="result-title">🎯 Classification Result</h1>
+                <p class="result-subtitle">AI-powered image analysis completed successfully</p>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>📷 Uploaded Image</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="image-container">
+                            <img 
+                                src="{{ url_for('static', filename='uploads/' + filename) }}" 
+                                alt="Uploaded Image" 
+                                class="result-image"
+                                onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Image+Not+Found'">
+                        </div>
+                        <div class="image-info">
+                            <div class="info-item">
+                                <span class="info-label">Filename:</span>
+                                <span class="info-value">{{ filename }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>🤖 AI Prediction</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="prediction-main">
+                            <div class="prediction-badge">
+                                <span class="prediction-icon">🎯</span>
+                                <span class="prediction-text">{{ prediction }}</span>
+                            </div>
+                            
+                            <div class="confidence-section">
+                                <div class="confidence-header">
+                                    <span class="confidence-label">Confidence Level</span>
+                                    <span class="confidence-value">{{ confidence }}</span>
+                                </div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: {{ confidence.replace('%', '') }}%"></div>
+                                </div>
+                                <div class="confidence-description">
+                                    {% set conf_num = confidence.replace('%', '') | float %}
+                                    {% if conf_num >= 90 %}
+                                        Very High Confidence
+                                    {% elif conf_num >= 70 %}
+                                        High Confidence
+                                    {% elif conf_num >= 50 %}
+                                        Moderate Confidence
+                                    {% else %}
+                                        Low Confidence
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <a href="{{ url_for('index') }}" class="btn-primary">
+                                <span class="btn-icon">🔄</span>
+                                Classify Another Image
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="model-info-section">
+                <div class="section-header">
+                    <h2>🔬 Model Information</h2>
+                    <p>Technical details about the AI model used for classification</p>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item-card">
+                        <div class="info-icon">🧠</div>
+                        <div class="info-content">
+                            <h4>Architecture</h4>
+                            <p>Convolutional Neural Network (CNN)</p>
+                            <span class="info-tag">Deep Learning</span>
+                        </div>
+                    </div>
+                    <div class="info-item-card">
+                        <div class="info-icon">📊</div>
+                        <div class="info-content">
+                            <h4>Training Dataset</h4>
+                            <p>CIFAR-10 (60,000 images)</p>
+                            <span class="info-tag">10 Classes</span>
+                        </div>
+                    </div>
+                    <div class="info-item-card">
+                        <div class="info-icon">🖼️</div>
+                        <div class="info-content">
+                            <h4>Input Size</h4>
+                            <p>32×32 pixels RGB</p>
+                            <span class="info-tag">Standardized</span>
+                        </div>
+                    </div>
+                    <div class="info-item-card">
+                        <div class="info-icon">⚡</div>
+                        <div class="info-content">
+                            <h4>Framework</h4>
+                            <p>TensorFlow & Keras</p>
+                            <span class="info-tag">Python</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">10</div>
+                        <div class="stat-label">Object Classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">32×32</div>
+                        <div class="stat-label">Input Resolution</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">60k</div>
+                        <div class="stat-label">Training Images</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">Real-time</div>
+                        <div class="stat-label">Processing Speed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.result-section {
+    padding: 120px 0 80px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.result-title {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, #fff, #f0f0f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.result-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Result Grid */
+.result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+@media (max-width: 968px) {
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Image Preview */
+.image-container {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.result-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-label {
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.info-value {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* Prediction Styles */
+.prediction-main {
+    text-align: center;
+}
+
+.prediction-badge {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+}
+
+.prediction-icon {
+    font-size: 2rem;
+    margin-right: 0.5rem;
+}
+
+.prediction-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+/* Confidence Section */
+.confidence-section {
+    margin-bottom: 2rem;
+}
+
+.confidence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.confidence-label {
+    font-weight: 500;
+}
+
+.confidence-value {
+    font-weight: 700;
+    color: #4CAF50;
+    font-size: 1.2rem;
+}
+
+.confidence-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    border-radius: 6px;
+    transition: width 1s ease-in-out;
+}
+
+.confidence-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-align: center;
+}
+
+/* Action Buttons */
+.action-buttons {
+    margin-top: 2rem;
+}
+
+.btn-primary, .btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    font-size: 1.2rem;
+}
+
+/* Model Information */
+.model-info-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    opacity: 0.8;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.info-item-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.info-icon {
+    font-size: 2rem;
+    opacity: 0.9;
+}
+
+.info-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.info-content p {
+    margin: 0 0 0.5rem 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.info-tag {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Stats Section */
+.stats-section {
+    margin-top: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, #fff, #f0f0f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .result-title {
+        font-size: 2.2rem;
+    }
+    
+    .prediction-text {
+        font-size: 1.4rem;
+    }
+    
+    .info-item-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
