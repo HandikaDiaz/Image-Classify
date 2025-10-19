@@ -9,19 +9,19 @@ app = Flask(__name__)
 app.secret_key = 'SECRETKEY'
 
 UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif')
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 try:
-    model = load_model('model/my_cnn_model.h5')
+    model = load_model('model.h5')
     print("Model loaded successfully!")
 except Exception as e:
-    print(f"Model not found: {e}")
-    print("Running in demo mode...")
-    model = None
+    print(f"Model not found: {e!r}")
+    exit(1)
 
 CLASS_NAMES = ['airplane', 'automobile', 'bird', 'cat', 'deer', 
             'dog', 'frog', 'horse', 'ship', 'truck']
@@ -52,7 +52,6 @@ def preprocess_image(img_path, target_size=(32, 32)):
         return img_array
     except Exception as e:
         print(f"Error preprocessing image: {e}")
-        return None
 
 @app.route('/')
 def index():
@@ -93,60 +92,23 @@ def predict():
                 return redirect(url_for('index'))
                 
             print("File saved successfully")
+            print("Using real model for prediction")
+            processed_image = preprocess_image(filepath)
             
-            if model is None:
-                print("Running in demo mode")
-                predicted_class = 3
-                confidence = 0.85
-                class_name = "cat"
-                if any(animal in filename.lower() for animal in ['dog', 'anjing']):
-                    class_name = "dog"
-                    confidence = 0.92
-                elif any(animal in filename.lower() for animal in ['cat', 'kucing']):
-                    class_name = "cat" 
-                    confidence = 0.88
-                elif any(animal in filename.lower() for animal in ['car', 'mobil']):
-                    class_name = "automobile"
-                    confidence = 0.95
-                elif any(animal in filename.lower() for animal in ['bird', 'burung']):
-                    class_name = "bird"
-                    confidence = 0.79
-                elif any(animal in filename.lower() for animal in ['airplane', 'pesawat']):
-                    class_name = "airplane"
-                    confidence = 0.99
-                elif any(animal in filename.lower() for animal in ['ship', 'kapal']):
-                    class_name = "ship"
-                    confidence = 0.98
-                elif any(animal in filename.lower() for animal in ['truck', 'truk']):
-                    class_name = "truck"
-                    confidence = 0.97
-                elif any(animal in filename.lower() for animal in ['horse', 'kuda']):
-                    class_name = "horse"
-                    confidence = 0.90
-                elif any(animal in filename.lower() for animal in ['deer', 'rusa']):
-                    class_name = "deer"
-                    confidence = 0.91
-                elif any(animal in filename.lower() for animal in ['frog', 'katak']):
-                    class_name = "frog"
-                    confidence = 0.85
-            else:
-                print("Using real model for prediction")
-                processed_image = preprocess_image(filepath)
+            if processed_image is not None:
+                predictions = model.predict(processed_image)
+                predicted_class = np.argmax(predictions[0])
+                confidence = np.max(predictions[0])
                 
-                if processed_image is not None:
-                    predictions = model.predict(processed_image)
-                    predicted_class = np.argmax(predictions[0])
-                    confidence = np.max(predictions[0])
-                    
-                    # Dapatkan nama kelas
-                    if predicted_class < len(CLASS_NAMES):
-                        class_name = CLASS_NAMES[predicted_class]
-                    else:
-                        class_name = f"Class {predicted_class}"
-                    print(f"Prediction: {class_name} with confidence {confidence:.2f}")
+                # Dapatkan nama kelas
+                if predicted_class < len(CLASS_NAMES):
+                    class_name = CLASS_NAMES[predicted_class]
                 else:
-                    flash('Error processing image')
-                    return redirect(url_for('index'))
+                    class_name = f"Class {predicted_class}"
+                print(f"Prediction: {class_name} with confidence {confidence:.2f}")
+            else:
+                flash('Error processing image')
+                return redirect(url_for('index'))
             
             return render_template('result.html', 
                                 filename=filename,
@@ -154,8 +116,7 @@ def predict():
                                 confidence=f"{confidence:.2%}")
         
         except Exception as e:
-            print(f"Error during prediction: {str(e)}")
-            flash(f'Error during prediction: {str(e)}')
+            print(f"Error during prediction: {e}")
             return redirect(url_for('index'))
     
     flash('Invalid file type. Please upload PNG, JPG, JPEG, or GIF.')
